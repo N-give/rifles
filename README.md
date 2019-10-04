@@ -1,5 +1,5 @@
 # rfiles
-Fast and Lightweight (hopefully) file browser build using Rust
+Fast, lightweight, and asynchronouts terminal file browser build using Rust
 
 # Dependencies
 
