@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 termion = "*"
+async-std = {version="0.99", features=["unstable"]}
+# futures-preview = "0.2.2"
