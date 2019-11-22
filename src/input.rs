@@ -1,5 +1,5 @@
 use async_std::io;
-use async_std::prelude::*;
+// use async_std::prelude::*;
 
 pub enum Dir {
     UP,
