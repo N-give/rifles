@@ -1,52 +1,33 @@
 use async_std::fs;
 use async_std::io;
 use async_std::prelude::*;
-use termion::color;
+use termion::{cursor, clear, color};
 
-pub async fn print_dir_contents(pos: usize) -> io::Result<()> {
+pub async fn print_dir_contents(_pos: usize) -> io::Result<()> {
     let mut stdout = io::stdout();
 
-    let contents = match get_dir_contents(".").await {
-        Ok(contents) => contents,
-        Err(e) => {
-            eprintln!("Failed to get directory contents: {}", e);
-            Vec::new()
-        }
-    };
-    for content in contents
-        .iter()
-        .enumerate()
-        .map(|(i, n)| {
-            if i == pos {
-                format!(
-                    "{}{}{}{}{}\n",
-                    color::Fg(color::Black),
-                    color::Bg(color::Blue),
-                    n.file_name().into_string().unwrap(),
-                    color::Fg(color::Blue),
-                    color::Bg(color::Reset)
-                )
-            } else {
-                format!(
-                    "{}{}{}{}{}\n",
-                    color::Fg(color::Blue),
-                    color::Bg(color::Black),
-                    n.file_name().into_string().unwrap(),
-                    color::Fg(color::Blue),
-                    color::Bg(color::Reset)
-                )
-            }
-        })
-        .into_iter() {
-        stdout.write_all(&content.as_bytes()).await?;
-    };
-    Ok(())
-}
+    stdout.write_all(format!("{}{}", clear::All, cursor::Goto(1, 1)).as_bytes()).await?;
 
-async fn get_dir_contents(dir: &str) -> io::Result<Vec<fs::DirEntry>> {
-    Ok(fs::read_dir(dir)
-        .await?
-        .filter_map(|r_entry| r_entry.ok())
-        .collect()
-        .await)
+    let mut entries = fs::read_dir(".").await?;
+    while let Some(entry_result) = entries.next().await {
+        let entry = entry_result?;
+        let mut output = String::new();
+
+        let ft = entry.file_type().await?;
+        if ft.is_dir() {
+            output.push_str(format!("{}", color::Fg(color::Cyan)).as_str());
+        } else if ft.is_file() {
+            output.push_str(format!("{}", color::Fg(color::White)).as_str());
+        } else {
+            output.push_str(format!("{}", color::Fg(color::Yellow)).as_str());
+        };
+
+        output.push_str(format!(
+                "{}{}\r\n",
+                entry.file_name().into_string().unwrap(),
+                color::Fg(color::Reset)).as_str());
+
+        stdout.write_all(output.as_bytes()).await?;
+    }
+    Ok(())
 }
