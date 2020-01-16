@@ -32,6 +32,11 @@ async fn format_output(entry: fs::DirEntry, selected: bool) -> io::Result<String
         output.push_str(format!("{}", color::Fg(color::Yellow)).as_str());
     };
 
-    output.push_str(format!("{}{}{}\r\n", name, color::Fg(color::Reset), color::Bg(color::Reset)).as_str());
+    output.push_str(format!(
+            "{}{}{}\r\n",
+            name,
+            color::Fg(color::Reset),
+            color::Bg(color::Reset)
+        ).as_str());
     Ok(output)
 }
