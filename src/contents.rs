@@ -5,12 +5,13 @@ use termion::{cursor, clear, color};
 
 pub async fn print_dir_contents(pos: usize) -> io::Result<()> {
     let mut stdout = io::stdout();
-    stdout.write_all(format!("{}{}", clear::All, cursor::Goto(1, 1)).as_bytes()).await?;
+    let mut output = format!("{}{}", clear::All, cursor::Goto(1, 1));
 
     let mut entries = fs::read_dir(".").await?.enumerate();
     while let Some((i, entry_result)) = entries.next().await {
-        stdout.write_all(format_output(entry_result?, pos == i).await?.as_bytes()).await?;
+        output.push_str(format_output(entry_result?, pos == i).await?.as_str());
     }
+    stdout.write_all(output.as_bytes()).await?;
     Ok(())
 }
 
