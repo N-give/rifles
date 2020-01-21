@@ -1,6 +1,4 @@
-use async_std::fs;
-use async_std::io;
-use async_std::prelude::*;
+use async_std::{fs, io, prelude::*};
 use termion::{cursor, clear, color};
 
 pub async fn print_dir_contents(pos: usize) -> io::Result<usize> {

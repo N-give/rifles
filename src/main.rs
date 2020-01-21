@@ -1,12 +1,13 @@
-use async_std::task;
-use async_std::io;
+use async_std::{task, io};
 use std::io::{stdin, stdout};
 use async_std::prelude::*;
-use termion::event::Key;
-use termion::input::TermRead;
-use termion::raw::IntoRawMode;
-use termion::cursor;
-use termion::clear;
+use termion::{
+    event::Key,
+    input::TermRead,
+    raw::IntoRawMode,
+    cursor,
+    clear
+};
 
 mod contents;
 
