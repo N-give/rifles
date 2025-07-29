@@ -1,4 +1,4 @@
-# rfiles
+# rifles
 Fast, lightweight, and asynchronouts terminal file browser build using Rust
 
 # Dependencies
