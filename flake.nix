@@ -15,6 +15,13 @@
           inherit system overlays;
         };
       in {
+        packages.default = pkgs.rustPlatform.buildRustPackage rec {
+          pname = "rifles";
+          version = "0.1";
+          cargoLock.lockFile = ./Cargo.lock;
+          src = pkgs.lib.cleanSource ./.;
+        };
+
         devShells.default = with pkgs; mkShell {
           buildInputs = [
             rust-analyzer
