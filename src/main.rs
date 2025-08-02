@@ -6,9 +6,9 @@ use crate::state::State;
 mod contents;
 mod state;
 
-fn main() -> Result<(), io::Error> {
+fn main() -> io::Result<()> {
     let stdin = stdin();
-    let _raw_stdout = stdout().into_raw_mode().expect("Failed to enter raw mode");
+    let _raw_stdout = stdout().into_raw_mode()?;
     let mut stdout = io::stdout();
 
     stdout.write_all(format!("{}", cursor::Hide).as_bytes())?;
