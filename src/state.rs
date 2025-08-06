@@ -1,6 +1,10 @@
-use std::{io, path::Path};
+use std::{
+    fs::File,
+    io::{self, Write},
+    path::Path,
+};
 
-use termion::event::Key;
+use termion::{clear, cursor, event::Key, terminal_size};
 
 use crate::contents::Directory;
 
@@ -27,7 +31,15 @@ impl State {
     }
 
     pub fn display(&mut self) -> io::Result<()> {
-        self.dir.display_entries()
+        self.dir.display_entries()?;
+        println!("here");
+        match &self.mode {
+            Mode::Browse => Ok(()),
+            Mode::Create(filename) => display_mutation(filename),
+            Mode::Rename(filename) => display_mutation(filename),
+            Mode::Delete => todo!("State::display => handle delete"),
+            Mode::Quit => Ok(()),
+        }
     }
 
     pub fn should_quit(&self) -> bool {
@@ -81,7 +93,11 @@ impl State {
     fn handle_key_create(&mut self, key: Key) -> io::Result<()> {
         match self.mode {
             Mode::Create(ref mut to_create) => match key {
-                Key::Char('\n') => todo!("create the new item {:?}", to_create),
+                Key::Char('\n') => {
+                    File::create_new(to_create.iter().collect::<String>())?;
+                    self.dir = Directory::default()?;
+                    self.mode = Mode::Browse;
+                }
                 Key::Char(c) => to_create.push(c),
                 Key::Backspace => {
                     to_create.pop();
@@ -100,6 +116,7 @@ impl State {
     fn handle_key_rename(&mut self, key: Key) -> io::Result<()> {
         match self.mode {
             Mode::Rename(ref mut to_create) => match key {
+                Key::Char('\n') => todo!("create the new item {:?}", to_create),
                 Key::Char(c) => to_create.push(c),
                 Key::Backspace => {
                     to_create.pop();
@@ -115,7 +132,22 @@ impl State {
         Ok(())
     }
 
-    fn handle_key_delete(&mut self, key: Key) -> io::Result<()> {
+    fn handle_key_delete(&mut self, _key: Key) -> io::Result<()> {
         todo!();
     }
+}
+
+fn display_mutation(filename: &Vec<char>) -> io::Result<()> {
+    let (_cols, rows) = terminal_size()?;
+    let output = format!(
+        "{}{}Filename: {}",
+        cursor::Goto(1, rows),
+        clear::CurrentLine,
+        filename.iter().collect::<String>()
+    );
+    let mut stdio = io::stdout();
+    stdio.write_all(output.as_bytes())?;
+    stdio.flush()?;
+
+    Ok(())
 }

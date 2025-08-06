@@ -3,7 +3,7 @@ use std::{
     fs,
     io::{self, Error, Write},
 };
-use termion::{clear, color, cursor};
+use termion::{clear, color, cursor, terminal_size};
 
 pub enum EntryType {
     FILE,
@@ -97,13 +97,16 @@ impl Directory {
 
     pub fn display_entries(&mut self) -> io::Result<()> {
         let mut display_str = format!("{}{}", clear::All, cursor::Goto(1, 1));
-        for (i, entry) in self.entries.iter_mut().enumerate() {
+        let (_cols, rows) = terminal_size()?;
+        for (i, entry) in self.entries.iter_mut().enumerate().take(rows.into()) {
             display_str.push_str(entry.format(self.position as usize == i).as_str());
             if self.position as usize == i {
                 self.working_directory = entry.path.clone();
             }
         }
-        io::stdout().write_all(display_str.as_bytes())?;
+        let mut stdout = io::stdout();
+        stdout.write_all(display_str.as_bytes())?;
+        stdout.flush()?;
         Ok(())
     }
 }
