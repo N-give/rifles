@@ -12,8 +12,8 @@ pub enum EntryType {
 }
 
 pub struct Entry {
-    path: String,
-    entry_type: EntryType,
+    pub(crate) path: String,
+    pub(crate) entry_type: EntryType,
 }
 
 impl Entry {
@@ -83,8 +83,8 @@ impl Directory {
         &self.working_directory
     }
 
-    pub fn current_selection(&self) -> &str {
-        &self.entries[self.position as usize].path
+    pub fn current_selection(&self) -> &Entry {
+        &self.entries[self.position as usize]
     }
 
     pub fn increase_position(&mut self) {
